@@ -3,7 +3,7 @@
 import expect from 'expect.js'
 import {create} from 'jss'
 
-import cache from './index'
+import cache, {marker} from './index'
 
 describe('jss-cache', () => {
   let jss
@@ -12,7 +12,7 @@ describe('jss-cache', () => {
     jss = create().use(cache())
   })
 
-  describe('ensure cache is used', () => {
+  describe('ensure marker based cache is used', () => {
     it('should not call onCreateRule', () => {
       const styles = {a: {color: 'red'}}
       let onCreateRuleCalled = false
@@ -25,19 +25,38 @@ describe('jss-cache', () => {
       })
       jss.createStyleSheet(styles)
       expect(onCreateRuleCalled).to.be(false)
-      expect(styles.a.__jss__).to.be.a('string')
+      expect(styles.a[marker]).to.be.a('string')
     })
-  })
 
-  describe('cache only regular rules', () => {
-    it('should not cache container rules', () => {
+    it('should not cache non-regular rules', () => {
       const styles = {
         '@media': {
           button: {color: 'red'}
         }
       }
       jss.createStyleSheet(styles)
-      expect(styles['@media'].__jss__).to.be(undefined)
+      expect(styles['@media'][marker]).to.be(undefined)
+    })
+
+    it('should not leak the flag to CSS', () => {
+      const styles = {a: {color: 'red'}}
+      const sheet = jss.createStyleSheet(styles)
+      expect(styles.a[marker]).to.be.a('string')
+      expect(sheet.toString().indexOf(marker)).to.be(-1)
+    })
+
+    it('should not call processors on a cached rule', () => {
+      const styles = {a: {color: 'red'}}
+      let onProcessRuleCalled = false
+      // After the first call its cached.
+      jss.createStyleSheet(styles)
+      jss.use({
+        onProcessRule: () => {
+          onProcessRuleCalled = true
+        }
+      })
+      jss.createStyleSheet(styles)
+      expect(onProcessRuleCalled).to.be(false)
     })
   })
 
@@ -55,7 +74,7 @@ describe('jss-cache', () => {
       })
       jss.createStyleSheet(styles, options)
       expect(onCreateRuleCalled).to.be(true)
-      expect(styles.a.__jss__).to.be(undefined)
+      expect(styles.a[marker]).to.be(undefined)
     })
   })
 })

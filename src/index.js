@@ -1,10 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 
+export const marker = '__jss__'
+
 export default () => {
   const cache = Object.create(null)
 
   function onCreateRule(name, decl) {
-    if (decl.__jss__) return cache[decl.__jss__]
+    if (decl[marker]) return cache[decl[marker]]
     return null
   }
 
@@ -15,7 +17,7 @@ export default () => {
     if (sheet && sheet.options.link) return
 
     cache[selector] = rule
-    rule.originalStyle.__jss__ = selector
+    rule.originalStyle[marker] = selector
   }
 
   return {onCreateRule, onProcessRule}
