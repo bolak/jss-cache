@@ -1,3 +1,7 @@
+## 0.2.2 / 2017-03-23
+
+- Don't copy marker when cloning styles to avoid to overcome the cache.
+
 ## 0.2.1 / 2017-03-01
 
 - Fixed improper webpack library name

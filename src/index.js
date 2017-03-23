@@ -17,7 +17,7 @@ export default () => {
     if (sheet && sheet.options.link) return
 
     cache[selector] = rule
-    rule.originalStyle[marker] = selector
+    Object.defineProperty(rule.originalStyle, marker, {value: selector})
   }
 
   return {onCreateRule, onProcessRule}

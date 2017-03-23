@@ -38,6 +38,14 @@ describe('jss-cache', () => {
       expect(styles['@media'][marker]).to.be(undefined)
     })
 
+    it('should allow cloning of styles without the marker', () => {
+      const styles = {
+        button: {color: 'red'}
+      }
+      jss.createStyleSheet(styles)
+      expect({...styles.button}[marker]).to.be(undefined)
+    })
+
     it('should not leak the flag to CSS', () => {
       const styles = {a: {color: 'red'}}
       const sheet = jss.createStyleSheet(styles)
