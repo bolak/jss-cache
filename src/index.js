@@ -1,31 +1,45 @@
-/* eslint-disable no-underscore-dangle */
+/**
+ * Tiny WeakMap like cache using arrays.
+ * Required because we have frozen style objects in dev, which are not extensible,
+ * so we can't put some key into that object.
+ * Relies on [].indexOf(Object).
+ */
+class Cache {
+  keys = []
 
-export const marker = '__jss__'
+  data = []
+
+  get(key) {
+    const index = this.keys.indexOf(key)
+    return index === -1 ? null : this.data[index]
+  }
+
+  set(key, value) {
+    this.keys.push(key)
+    this.data.push(value)
+  }
+}
 
 export default () => {
-  const cache = Object.create(null)
+  const cache = new Cache()
 
   function onCreateRule(name, decl, {parent}) {
-    if (parent) {
-      const selector = parent.rules.raw[name][marker]
-      if (selector) return cache[selector]
-    }
-
-    return null
+    return parent ? cache.get(parent.rules.raw[name]) : null
   }
 
   function onProcessRule(rule) {
-    const {selector, type, options: {sheet, parent}} = rule
+    const {options: {sheet, parent}} = rule
 
-    if (type !== 'regular' || cache[selector]) return
-    if (!parent) return
-    if (sheet && sheet.options.link) return
-
-    cache[selector] = rule
-    const originalStyle = parent.rules.raw[rule.name]
-    if (!originalStyle[marker]) {
-      Object.defineProperty(originalStyle, marker, {value: selector})
+    if (
+      !parent ||
+      (sheet && sheet.options.link)
+    ) {
+      return
     }
+
+    const originalStyle = parent.rules.raw[rule.name]
+
+    if (!cache.get(originalStyle)) cache.set(originalStyle, rule)
   }
 
   return {onCreateRule, onProcessRule}
