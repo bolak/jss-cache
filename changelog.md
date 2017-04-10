@@ -1,3 +1,7 @@
+## 1.0.0 / 2017-04-10
+
+- Support JSS 7.0
+
 ## 0.2.2 / 2017-03-23
 
 - Don't copy marker when cloning styles to avoid to overcome the cache.
