@@ -37,7 +37,7 @@ export default () => {
       return
     }
 
-    const originalStyle = parent.rules.raw[rule.name]
+    const originalStyle = parent.rules.raw[rule.key]
 
     if (!cache.get(originalStyle)) cache.set(originalStyle, rule)
   }
