@@ -1,6 +1,6 @@
 # JSS plugin that caches the rules.
 
-This plugin will cache virtual rules by checking if a passt style object has been already passed.
+This plugin will cache virtual rules by checking if a past style object has been already passed.
 
 It should be used as a __first__ plugin, to bail out before any unnecessary work is done!!!
 
